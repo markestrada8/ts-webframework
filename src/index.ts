@@ -1,12 +1,18 @@
-import { User } from "./models/User";
+import { User, UserProps } from "./models/User";
 import axios from 'axios'
 
 const url = 'http://localhost:3000/users'
 
-const user = new User({ name: 'Jon Snow', age: 23 })
+const user = User.buildUser({ id: 1, name: 'will it save', age: 23234 })
 
-user.events.on('click', () => { console.log('Thou clickest me') })
-user.events.trigger('click')
+// console.log(user.get<'name'>('name'))
+
+user.on('change', () => {
+  console.log(user)
+})
+
+user.save()
+user.fetch()
 
 
 // axios.post(url, {

@@ -117,46 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/Eventing.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Eventing = void 0;
-
-var Eventing =
-/** @class */
-function () {
-  function Eventing() {
-    this.events = {};
-  } //EVENT SUBSCRIBER - ADD CALLBACKS TO ARRAY FOR EACH ACTION/EVENT
-
-
-  Eventing.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  }; //INVOKE ALL CALLBACKS FOR EACH ACTION/EVENT
-
-
-  Eventing.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-
-    if (!handlers || handlers.length === 0) {
-      return;
-    }
-
-    handlers.forEach(function (callBack) {
-      callBack();
-    });
-  };
-
-  return Eventing;
-}();
-
-exports.Eventing = Eventing;
-},{}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+})({"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -4582,7 +4543,7 @@ module.exports.default = axios;
 
 },{"./utils":"node_modules/axios/lib/utils.js","./helpers/bind":"node_modules/axios/lib/helpers/bind.js","./core/Axios":"node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"node_modules/axios/lib/core/mergeConfig.js","./defaults":"node_modules/axios/lib/defaults/index.js","./cancel/CanceledError":"node_modules/axios/lib/cancel/CanceledError.js","./cancel/CancelToken":"node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"node_modules/axios/lib/cancel/isCancel.js","./env/data":"node_modules/axios/lib/env/data.js","./helpers/toFormData":"node_modules/axios/lib/helpers/toFormData.js","../lib/core/AxiosError":"node_modules/axios/lib/core/AxiosError.js","./helpers/spread":"node_modules/axios/lib/helpers/spread.js","./helpers/isAxiosError":"node_modules/axios/lib/helpers/isAxiosError.js"}],"node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/Sync.ts":[function(require,module,exports) {
+},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/APISync.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -4594,23 +4555,23 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Sync = void 0;
+exports.APISync = void 0;
 
 var axios_1 = __importDefault(require("axios"));
 
-var Sync =
+var APISync =
 /** @class */
 function () {
-  function Sync(rootURL) {
+  function APISync(rootURL) {
     this.rootURL = rootURL;
   }
 
-  Sync.prototype.fetch = function (id) {
+  APISync.prototype.fetch = function (id) {
     return axios_1.default.get("".concat(this.rootURL, "/").concat(id));
   }; //MY CODE
 
 
-  Sync.prototype.save = function (data) {
+  APISync.prototype.save = function (data) {
     var id = data.id;
 
     if (id) {
@@ -4620,37 +4581,231 @@ function () {
     }
   };
 
-  return Sync;
+  return APISync;
 }();
 
-exports.Sync = Sync;
-},{"axios":"node_modules/axios/index.js"}],"src/models/User.ts":[function(require,module,exports) {
+exports.APISync = APISync;
+},{"axios":"node_modules/axios/index.js"}],"src/models/Attributes.ts":[function(require,module,exports) {
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Attributes = void 0;
+
+var Attributes =
+/** @class */
+function () {
+  function Attributes(data) {
+    var _this = this;
+
+    this.data = data;
+
+    this.get = function (key) {
+      return _this.data[key];
+    };
+  }
+
+  Attributes.prototype.set = function (update) {
+    Object.assign(this.data, update);
+  };
+
+  Attributes.prototype.getAll = function () {
+    return this.data;
+  };
+
+  return Attributes;
+}();
+
+exports.Attributes = Attributes; // const attributes = new Attributes<UserProps>({ id: 5, name: 'person', age: 21 })
+// const name = attributes.get('name')
+// const age = attributes.get('age')
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Eventing = void 0;
+
+var Eventing =
+/** @class */
+function () {
+  function Eventing() {
+    var _this = this;
+
+    this.events = {}; //EVENT SUBSCRIBER - ADD CALLBACKS TO ARRAY FOR EACH ACTION/EVENT
+
+    this.on = function (eventName, callback) {
+      var handlers = _this.events[eventName] || [];
+      handlers.push(callback);
+      _this.events[eventName] = handlers;
+    }; //INVOKE ALL CALLBACKS FOR EACH ACTION/EVENT
+
+
+    this.trigger = function (eventName) {
+      var handlers = _this.events[eventName];
+
+      if (!handlers || handlers.length === 0) {
+        return;
+      }
+
+      handlers.forEach(function (callBack) {
+        callBack();
+      });
+    };
+  }
+
+  return Eventing;
+}();
+
+exports.Eventing = Eventing;
+},{}],"src/models/Model.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Model = void 0;
+
+var Model =
+/** @class */
+function () {
+  function Model(attributes, events, sync) {
+    this.attributes = attributes;
+    this.events = events;
+    this.sync = sync;
+  }
+
+  Object.defineProperty(Model.prototype, "on", {
+    //condensed code
+    // on = this.events.on;
+    // trigger = this.events.trigger;
+    // get = this.attributes.get;
+    // eventing methods
+    get: function get() {
+      return this.events.on;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Model.prototype, "trigger", {
+    get: function get() {
+      return this.events.trigger;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Model.prototype, "get", {
+    // attributes methods
+    get: function get() {
+      return this.attributes.get;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  Model.prototype.set = function (update) {
+    this.attributes.set(update);
+    this.events.trigger('change');
+  }; // sync methods
+
+
+  Model.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.attributes.get('id');
+
+    if (typeof id !== 'number') {
+      throw new Error('ID not found');
+    }
+
+    this.sync.fetch(id).then(function (response) {
+      _this.set(response.data);
+    });
+  };
+
+  Model.prototype.save = function () {
+    var _this = this;
+
+    this.sync.save(this.attributes.getAll()).then(function (response) {
+      _this.trigger('save');
+    }).catch(function (error) {
+      console.log('save error: ', error);
+
+      _this.trigger('error');
+    });
+  };
+
+  return Model;
+}();
+
+exports.Model = Model;
+},{}],"src/models/User.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.User = void 0;
 
+var APISync_1 = require("./APISync");
+
+var Attributes_1 = require("./Attributes");
+
 var Eventing_1 = require("./Eventing");
 
-var Sync_1 = require("./Sync");
+var Model_1 = require("./Model");
 
 var rootURL = "http://localhost:3000/users";
 
 var User =
 /** @class */
-function () {
+function (_super) {
+  __extends(User, _super);
+
   function User() {
-    this.events = new Eventing_1.Eventing();
-    this.sync = new Sync_1.Sync(rootURL);
+    return _super !== null && _super.apply(this, arguments) || this;
   }
 
+  User.buildUser = function (attributes) {
+    return new User(new Attributes_1.Attributes(attributes), new Eventing_1.Eventing(), new APISync_1.APISync(rootURL));
+  }; // SETUP CODE EXTRACED TO MODEL CLASS
+
+
   return User;
-}();
+}(Model_1.Model);
 
 exports.User = User;
-},{"./Eventing":"src/models/Eventing.ts","./Sync":"src/models/Sync.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./APISync":"src/models/APISync.ts","./Attributes":"src/models/Attributes.ts","./Eventing":"src/models/Eventing.ts","./Model":"src/models/Model.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4660,14 +4815,17 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = require("./models/User");
 
 var url = 'http://localhost:3000/users';
-var user = new User_1.User({
-  name: 'Jon Snow',
-  age: 23
+var user = User_1.User.buildUser({
+  id: 1,
+  name: 'will it save',
+  age: 23234
+}); // console.log(user.get<'name'>('name'))
+
+user.on('change', function () {
+  console.log(user);
 });
-user.events.on('click', function () {
-  console.log('Thou clickest me');
-});
-user.events.trigger('click'); // axios.post(url, {
+user.save();
+user.fetch(); // axios.post(url, {
 //   name: 'userOne',
 //   age: 21
 // })
@@ -4717,7 +4875,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60703" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53051" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
