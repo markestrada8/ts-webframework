@@ -1,20 +1,28 @@
-import { User, UserProps } from "./models/User";
-import axios from 'axios'
+import { User } from "./models/User";
+import { UserForm } from "./views/UserForm";
 
-const url = 'http://localhost:3000/users'
+const user = User.buildUser({ id: 5, name: 'Barry', age: 23 });
 
-const user = User.buildUser({ id: 1, name: 'will it save', age: 23234 })
+const userForm = new UserForm(
+  document.getElementById("root"),
+  user
+)
+
+userForm.render()
+
+
+
+// const url = 'http://localhost:3000/users'
 
 // console.log(user.get<'name'>('name'))
 
-user.on('change', () => {
-  console.log(user)
-})
+// const collection = User.buildUserCollection()
 
-user.save()
-user.fetch()
+// collection.on('change', () => {
+//   console.log(collection)
+// })
 
-
+// collection.fetchAll()
 // axios.post(url, {
 //   name: 'userOne',
 //   age: 21
