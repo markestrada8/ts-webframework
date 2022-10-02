@@ -4987,8 +4987,14 @@ var user = User_1.User.buildUser({
   name: 'Barry',
   age: 23
 });
-var userForm = new UserForm_1.UserForm(document.getElementById("root"), user);
-userForm.render(); // const url = 'http://localhost:3000/users'
+var root = document.getElementById("root");
+
+if (root) {
+  var userForm = new UserForm_1.UserForm(root, user);
+  userForm.render();
+} else {
+  throw new Error('Root element not defined');
+} // const url = 'http://localhost:3000/users'
 // console.log(user.get<'name'>('name'))
 // const collection = User.buildUserCollection()
 // collection.on('change', () => {
@@ -5045,7 +5051,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63579" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53964" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
