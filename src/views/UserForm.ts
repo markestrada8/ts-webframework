@@ -1,20 +1,12 @@
-import { User } from "../models/User"
+import { View } from './View'
+import { User, UserProps } from '../models/User'
 
-export class UserForm {
-  constructor(public parent: HTMLElement, public model: User) {
-    this.bindModel()
-  }
-
-  bindModel() {
-    this.model.on('change', () => {
-      this.render()
-    })
-  }
-
+export class UserForm extends View<User, UserProps> {
   eventsMap(): { [key: string]: () => void } {
     return {
       'click:.set-age': this.onSetAgeClick,
-      'click:.set-name': this.onSetNameClick
+      'click:.set-name': this.onSetNameClick,
+      'click:.save-model': this.onSaveClick,
     }
   }
 
@@ -29,48 +21,25 @@ export class UserForm {
       const name = input.value
       this.model.set({ name: name })
     }
-   
   }
 
+  onSaveClick = (): void => {
+    this.model.save()
+  }
+
+
   template() {
+    // THESE ELEMENTS NOW HANDLED BY USER EDIT
+    // <h2>${this.model.get('name')}</h2>
+    // <h2>${this.model.get('age')}</h2>
     return `
     <div>
-      <h1>User Form</h1>
-      <h3>User Name: ${this.model.get('name')}</h3>
-      <h3>User Age: ${this.model.get('age')}</h3>
-      <input />
+      <input placeholder="${this.model.get('name')}"/>
       <button class="set-name">Change Name</button>
       <button class="set-age">Set Random Age</button>
+      <button class="save-model">Save</button>
     </div>
     `
   }
 
-  bindEvents(fragment: DocumentFragment): void {
-    const eventsMap = this.eventsMap()
-
-    for (let eventKey in eventsMap) {
-      const [eventName, selector] = eventKey.split(':')
-
-      fragment.querySelectorAll(selector).forEach(element => {
-        element.addEventListener(eventName, eventsMap[eventKey])
-      })
-    }
-
-  }
-
-  render() {
-    //EMPTY PARENT ELEMENT (INSANTIATED WITH 'ROOT' AS PARENT)
-    this.parent.innerHTML = ''
-
-    //CREATE ELEMENT / WRITE HTML TO ELEMENT
-    const templateElement = document.createElement('template')
-    templateElement.innerHTML = this.template()
-
-    //BIND EVENT AND LISTENERS TO PARENT ELEMENT
-    //CONTENT = REFERENCE TO HTML DOCUMENT FRAGMENT
-    this.bindEvents(templateElement.content)
-
-    //INSERT FRAGEMENT INTO DOM UNDER PARENT
-    this.parent.append(templateElement.content)
-  }
 }

@@ -4,7 +4,7 @@ import { User, UserProps } from "./User";
 
 export class Collection<T, K> {
   models: T[] = [];
-  events = new Eventing()
+  events: Eventing = new Eventing()
 
   constructor(public rootURL: string, public deserialize: (json: K) => T) { }
 
@@ -16,7 +16,7 @@ export class Collection<T, K> {
     return this.events.trigger
   }
 
-  fetchAll(): void {
+  fetch(): void {
     axios.get(this.rootURL)
       .then((response: AxiosResponse) => {
         response.data.forEach((item: K) => {
@@ -25,7 +25,7 @@ export class Collection<T, K> {
         this.trigger('change')
       })
       .catch((error: AxiosError) => {
-        console.log('Axios error: ', error)
+        console.log('Axios get error: ', error)
       })
   }
 }

@@ -18,7 +18,7 @@ interface Events {
   trigger(eventName: string): void
 }
 
-interface HasID {
+export interface HasID {
   id?: number
 }
 
@@ -47,13 +47,13 @@ export class Model<T extends HasID> {
     return this.attributes.get
   }
 
-  set(update: T) {
+  set(update: T): void {
     this.attributes.set(update)
     this.events.trigger('change')
   }
   // sync methods
   fetch(): void {
-    const id = this.attributes.get('id')
+    const id = this.get('id')
     if (typeof id !== 'number') {
       throw new Error('ID not found')
     }
@@ -65,7 +65,7 @@ export class Model<T extends HasID> {
 
   save(): void {
     this.sync.save(this.attributes.getAll())
-      .then((response: AxiosResponse) => {
+      .then((response: AxiosResponse): void => {
         this.trigger('save')
       })
       .catch((error: any) => {
